@@ -46,9 +46,8 @@ run_step "Configure proper ownership for web directories..." "chown -R webmaster
 run_step "Create /privat directory for webmaster access..." "mkdir -p /var/www/html/privat"
 run_step "Configure ownership for protected area..." "chown -R webmaster:www-data /var/www/html/privat"
 run_step "Add content to protected directory..." "echo '<h1>Private Area</h1><p>This is a protected area.</p>' | tee /var/www/html/privat/index.html"
-run_step "Set up access control for /privat directory with directory-based authentication..." "printf '<Directory /var/www/html/privat>\n    AuthType Basic\n    AuthName \"Restricted Area\"\n    AuthUserFile /etc/apache2/.htpasswd\n    Require user webmaster\n</Directory>' | tee /etc/apache2/conf-available/privat.conf && a2enconf privat && systemctl reload apache2"
+run_step "Set up access control for /privat directory with directory-based authentication..." "printf '<Directory /var/www/html/privat>\n    AuthType Basic\n    AuthName \"Restricted Area\"\n    AuthUserFile /etc/apache2/.htpasswd\n    Require user webmaster\n    Require ip 192.168.1.0/24\n</Directory>' | tee /etc/apache2/conf-available/privat.conf && a2enconf privat && systemctl reload apache2"
 run_step "Create password file for webmaster authentication..." "htpasswd -cb /etc/apache2/.htpasswd webmaster root"
-run_step "Restrict access to local network and specific IP..." "echo 'Require ip 192.168.1.0/24' | tee -a /etc/apache2/conf-available/privat.conf && systemctl reload apache2"
 
 ########################################################
 ### --- Configure User Homepages and CGI Support --- ###
